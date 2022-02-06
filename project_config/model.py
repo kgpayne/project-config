@@ -2,6 +2,10 @@ class RequiredFieldError(Exception):
     pass
 
 
+class StorageNotFound(Exception):
+    pass
+
+
 class BaseField:
     """Base Model field type class"""
 
@@ -29,7 +33,12 @@ class BaseProperty:
     Used to create concrete data classes from Model representations.
     """
 
-    pass
+    def commit(self, *args, **kwargs):
+        if self.storage is not None:
+            return self.storage.commit(*args, **kwargs)
+        else:
+            # recurse parents until storage found
+            raise StorageNotFound
 
 
 def property_maker(name):
@@ -61,7 +70,7 @@ class Model:
     """Object declaration class.
 
     Model subclasses are used to map a class representation
-    to an underlying persistance representation (dict). it
+    to an underlying persistance representation (dict). It
     is also used to generate JSONSchema for represented objects.
     """
 
