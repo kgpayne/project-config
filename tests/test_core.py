@@ -1,69 +1,16 @@
 import pytest
 import project_config as pc
 
-
-class SettingGroupValidation(pc.Model):
-    pass
+from .conftest import ProjectFile
 
 
-class Setting(pc.Model):
-    pass
+def test_dict_storage(example_project, example_project_dict):
+    assert example_project._dict == example_project_dict
 
 
-class Extractor(pc.Model):
-    __metadata__ = {
-        "additionalProperties": True
-    }
-    name = pc.Item(str, required=True)
-    inherit_from = pc.Item(str)
-    pip_url = pc.Item(str)
-    variant = pc.Item(str)
-    namespace = pc.Item(str)
-    config = pc.Item(str)
-    label = pc.Item(str)
-    logo_url = pc.Item(str)
-    executable = pc.Item(str)
-    settings = pc.Array(Setting)
-    docs = pc.Item(str)
-    settings_group_validation = pc.Array(SettingGroupValidation)
-    commands = pc.Item(str)
-
-
-class Plugins(pc.Model):
-    __metadata__ = {
-        "additionalProperties": False
-    }
-    extractors = pc.Array(Extractor)
-
-
-class ProjectFile(pc.Model):
-    __metadata__ = {
-        "title": "A Project file.",
-        "description": "Project is an Open Source project. Read more at https://github.com/kgpayne/project-config"
-    }
-    plugins = pc.Item(Plugins)
-
-
-example_project_file_dict = {
-    "plugins": {
-        "extractors": [
-            {
-                "name": "test-extractor",
-                "inherit_from": "test-inherit-from",
-                "pip_url": "test-pip-url"
-            }
-        ]
-    }
-}
-
-pf = ProjectFile.from_dict(example_project_file_dict)
-
-def test_dict_storage():
-    assert pf._dict == example_project_file_dict
-
-def test_properties_created():
+def test_properties_created(example_project):
     top_keys = [
-        k for k in list(pf.__class__.__dict__.keys())
+        k for k in list(example_project.__class__.__dict__.keys())
         if not k.startswith('__')
     ]
     assert top_keys == [
@@ -71,7 +18,7 @@ def test_properties_created():
     ]
 
     plugins_keys = [
-        k for k in list(pf.plugins.__class__.__dict__.keys())
+        k for k in list(example_project.plugins.__class__.__dict__.keys())
         if not k.startswith('__')
     ]
     assert plugins_keys == [
@@ -79,7 +26,7 @@ def test_properties_created():
     ]
 
     extractor_keys = [
-        k for k in list(pf.plugins.extractors[0].__class__.__dict__.keys())
+        k for k in list(example_project.plugins.extractors[0].__class__.__dict__.keys())
         if not k.startswith('__')
     ]
     assert extractor_keys == [
@@ -87,15 +34,19 @@ def test_properties_created():
     ]
 
 
-def test_edit_dict():
-    pf.plugins.extractors[0].name = 'updated-test-extractor'
-    assert example_project_file_dict['plugins']['extractors'][0]['name'] == 'updated-test-extractor'
+def test_edit_dict(example_project, example_project_dict):
+    example_project.plugins.extractors[0].name = 'updated-test-extractor'
+    assert (
+        example_project_dict['plugins']['extractors'][0]['name']
+        == 'updated-test-extractor'
+    )
 
 
-def test_required_field():
+def test_required_field(example_project_dict):
     """ This should raise on instantiation ideally.
+    TODO: add validation on creation
     """
-    example_project_file_dict['plugins']['extractors'][0].pop('name')
+    example_project_dict['plugins']['extractors'][0].pop('name')
     with pytest.raises(pc.RequiredFieldError):
-        pf = ProjectFile.from_dict(example_project_file_dict)
+        pf = ProjectFile.from_dict(example_project_dict)
         pf.plugins.extractors[0].name
