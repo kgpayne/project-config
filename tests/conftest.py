@@ -1,4 +1,5 @@
 import pytest
+
 import project_config as pc
 
 
@@ -11,9 +12,7 @@ class Setting(pc.Model):
 
 
 class Extractor(pc.Model):
-    __metadata__ = {
-        "additionalProperties": True
-    }
+    __metadata__ = {"additionalProperties": True}
     name = pc.Field(str, required=True)
     inherit_from = pc.Field(str)
     pip_url = pc.Field(str)
@@ -30,16 +29,14 @@ class Extractor(pc.Model):
 
 
 class Plugins(pc.Model):
-    __metadata__ = {
-        "additionalProperties": False
-    }
+    __metadata__ = {"additionalProperties": False}
     extractors = pc.Array(Extractor)
 
 
 class ProjectFile(pc.Model):
     __metadata__ = {
         "title": "A Project file.",
-        "description": "Project is an Open Source project. Read more at https://github.com/kgpayne/project-config"
+        "description": "Project is an Open Source project. Read more at https://github.com/kgpayne/project-config",
     }
     plugins = pc.Field(Plugins)
 
@@ -50,7 +47,7 @@ example_project_values = {
             {
                 "name": "test-extractor",
                 "inherit_from": "test-inherit-from",
-                "pip_url": "test-pip-url"
+                "pip_url": "test-pip-url",
             }
         ]
     }
@@ -64,6 +61,4 @@ def example_project_dict():
 
 @pytest.fixture
 def example_project(example_project_dict):
-    return ProjectFile.from_dict(
-        example_project_dict
-    )
+    return ProjectFile.from_dict(example_project_dict)

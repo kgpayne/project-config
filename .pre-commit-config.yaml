@@ -18,14 +18,14 @@ repos:
         entry: poetry run flake8
         language: system
         types: [python]
-        files: 'singer_sdk/.*'
+        files: 'project_config/.*'
 
       # - id: mypy
       #   name: mypy
       #   entry: poetry run mypy
       #   language: system
       #   types: [python]
-      #   exclude: singer_sdk/tests/.*
+      #   exclude: project_config/tests/.*
 
       # - id: pyupgrade
       #   name: pyupgrade
