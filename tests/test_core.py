@@ -10,26 +10,18 @@ def test_dict_storage(example_project, example_project_dict):
 
 
 def test_properties_created(example_project):
-    top_keys = [
-        k
-        for k in list(example_project.__class__.__dict__.keys())
-        if not k.startswith("__")
-    ]
-    assert top_keys == ["_dict", "_model", "plugins"]
 
-    plugins_keys = [
-        k
-        for k in list(example_project.plugins.__class__.__dict__.keys())
-        if not k.startswith("__")
-    ]
-    assert plugins_keys == ["_dict", "_model", "extractors"]
+    assert set(["_dict", "_model", "plugins"]).issubset(
+        example_project.__class__.__dict__.keys()
+    )
 
-    extractor_keys = [
-        k
-        for k in list(example_project.plugins.extractors[0].__class__.__dict__.keys())
-        if not k.startswith("__")
-    ]
-    assert extractor_keys == ["_dict", "_model", "name", "inherit_from", "pip_url"]
+    assert set(["_dict", "_model", "extractors"]).issubset(
+        example_project.plugins.__class__.__dict__.keys()
+    )
+
+    assert set(["_dict", "_model", "name", "inherit_from", "pip_url"]).issubset(
+        example_project.plugins.extractors[0].__class__.__dict__.keys()
+    )
 
 
 def test_edit_dict(example_project, example_project_dict):
@@ -47,4 +39,5 @@ def test_required_field(example_project_dict):
     example_project_dict["plugins"]["extractors"][0].pop("name")
     with pytest.raises(pc.RequiredFieldError):
         pf = ProjectFile.from_dict(example_project_dict)
+        # raises on access, because of lazy-loading
         pf.plugins.extractors[0].name

@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pytest
 
 import project_config as pc
@@ -34,6 +36,7 @@ class Plugins(pc.Model):
 
 
 class ProjectFile(pc.Model):
+    __storage_root__ = True
     __metadata__ = {
         "title": "A Project file.",
         "description": "Project is an Open Source project. Read more at https://github.com/kgpayne/project-config",
@@ -56,7 +59,7 @@ example_project_values = {
 
 @pytest.fixture
 def example_project_dict():
-    return example_project_values
+    return deepcopy(example_project_values)
 
 
 @pytest.fixture
