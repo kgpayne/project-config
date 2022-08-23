@@ -21,9 +21,7 @@ class ProjectFile:
     def validate(self, root: Path):
         if self.required and not (root / self.path).exists():
             raise FileNotFoundError(f"Required file {self.path} does not exist.")
-        if not (root / self.path).exists():
-            return False
-        return True
+        return bool((root / self.path).exists())
 
 
 class ProjectFilePattern:
